@@ -1,6 +1,8 @@
 'use strict';
 const models = require('../../models/index');
 const request = require('request');
+const rp = require('request-promise-native');
+const fetch = require('node-fetch');
 
 const Mercancia = models.mercancia;
 const Responsable = models.responsable;
@@ -51,14 +53,34 @@ exports.get_mercancia = function(req, res){
 	);
 }
 
-exports.get_mercancia_detalles = function(req, res){
+exports.get_mercancia_detalles = async function(req, res){
 	if(isNaN(parseInt(req.params.id_mercancia))){
 		res.status(400).json({ msg: 'Utilizar parametros numericos'});
 		return;
 	}
 	let detalles = [];
 	let errores = [];
-	request(`http://localhost:3001/api/plugina/pasa/${req.params.id_mercancia}/detalle`, function(errorA, resPlugA, bodyPlugA){
+	try {
+		let detallePromiseA = await fetch(`http://localhost:3001/api/plugina/pasa/${req.params.id_mercancia}/detalle`);
+		let detalleA = await detallePromiseA.json();
+		detalles = detalles.concat(detalleA);
+	}catch(error){
+		console.log(error);
+		errores.push("No se pudo contactar a Plugin A");
+	}
+	try {
+		let detallePromiseB = await fetch(`http://localhost:3002/api/pluginb/pasa/${req.params.id_mercancia}/detalle`);
+		let detalleB = await detallePromiseB.json();
+		detalles = detalles.concat(detalleB);
+	}catch(errorB){
+		console.log(errorB);
+		errores.push("No se pudo contactar a Plugin B");
+	}
+	let respuesta = new Object();
+	respuesta.detalles = detalles;
+	respuesta.errores = errores;
+	res.status(200).json(respuesta);
+	/*request(`http://localhost:3001/api/plugina/pasa/${req.params.id_mercancia}/detalle`, function(errorA, resPlugA, bodyPlugA){
 		if (errorA){
 			errores.push("No se pudo contactar a plugin A");
 		}
@@ -84,5 +106,5 @@ exports.get_mercancia_detalles = function(req, res){
 			}
 		});
 	});
-	
+	*/
 }

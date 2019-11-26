@@ -7,5 +7,6 @@ const router = express.Router();
 
 router.get('/pais', coreController.get_paises);
 router.get('/mercancia/:id_mercancia', mercanciaController.get_mercancia);
+router.get('/mercancia/:id_mercancia/detalles', mercanciaController.get_mercancia_detalles);
 
 module.exports = router;

@@ -1,5 +1,6 @@
 'use strict';
 const models = require('../../models/index');
+const request = require('request');
 
 const Mercancia = models.mercancia;
 const Responsable = models.responsable;
@@ -11,19 +12,6 @@ exports.get_mercancia = function(req, res){
 		res.status(400).json({ msg: 'Utilizar parametros numericos'});
 		return;
 	}
-	
-	/*Mercancia.belongsTo(Responsable, {foreignKey: 'id_envia', as: 'envia'});
-	Responsable.hasMany(Mercancia, {foreignKey: 'id_envia', as: 'envia'});
-
-	Mercancia.belongsTo(Responsable, {foreignKey: 'id_recibe', as: 'recibe'});
-	Responsable.hasMany(Mercancia, {foreignKey: 'id_recibe', as: 'recibe'});
-
-	Responsable.belongsTo(Pais, {foreignKey: 'id_pais', as: 'pais'});
-	Pais.hasMany(Responsable, {foreignKey: 'id_pais', as: 'pais'});
-
-	Mercancia.belongsTo(TipoMercancia, {foreignKey: 'id_tipo_mercancia'});
-	TipoMercancia.hasMany(Mercancia, {foreignKey: 'id_tipo_mercancia'});*/
-
 	Mercancia.findOne({
 			include:[
 				{
@@ -52,7 +40,7 @@ exports.get_mercancia = function(req, res){
 		})
 		.then(mercancia => {
 			if(mercancia === null){
-				res.sendStatus(404);
+				res.status(404).json({ msg: 'Mercancia no existe'});
 				return;
 			}
 			res.status(200).json(mercancia);
@@ -63,3 +51,38 @@ exports.get_mercancia = function(req, res){
 	);
 }
 
+exports.get_mercancia_detalles = function(req, res){
+	if(isNaN(parseInt(req.params.id_mercancia))){
+		res.status(400).json({ msg: 'Utilizar parametros numericos'});
+		return;
+	}
+	let detalles = [];
+	let errores = [];
+	request(`http://localhost:3001/api/plugina/pasa/${req.params.id_mercancia}/detalle`, function(errorA, resPlugA, bodyPlugA){
+		if (errorA){
+			errores.push("No se pudo contactar a plugin A");
+		}
+		else{
+			if(resPlugA.statusCode === 200){
+				console.log(JSON.parse(bodyPlugA));
+				detalles = detalles.concat(JSON.parse(bodyPlugA));
+			}
+		}
+		request(`http://localhost:3002/api/pluginb/pasa/${req.params.id_mercancia}/detalle`, function(errorB, resPlugB, bodyPlugB){
+			if(errorB){
+				errores.push("No se pudo contactar a plugin B");
+			}
+			else{
+				if(resPlugB.statusCode === 200){
+					console.log(JSON.parse(bodyPlugB));
+					detalles = detalles.concat(JSON.parse(bodyPlugB));
+					let respuesta = new Object();
+					respuesta.detalles = detalles;
+					respuesta.errores = errores;
+					res.status(200).json(respuesta);
+				}
+			}
+		});
+	});
+	
+}

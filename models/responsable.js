@@ -5,16 +5,13 @@ module.exports = function(sequelize, DataTypes) {
 		id_responsable: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
-			primaryKey: true,
-			autoIncrement: true
+			defaultValue: 'nextval(responsable_id_responsable_seq::regclass)',
+			primaryKey: true
 		},
 		id_pais: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
-			references: {
-				model: 'pais',
-				key: 'id_pais'
-			}
+			primaryKey: true
 		},
 		nombres_responsable: {
 			type: DataTypes.STRING,

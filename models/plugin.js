@@ -1,23 +1,26 @@
 /* jshint indent: 1 */
 
 module.exports = function(sequelize, DataTypes) {
-	return sequelize.define('marca', {
-		id_marca: {
+	return sequelize.define('plugin', {
+		id_plugin: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
-			defaultValue: 'nextval(marca_id_marca_seq::regclass)',
 			primaryKey: true
 		},
-		nombre_marca: {
+		url_plugin: {
 			type: DataTypes.STRING,
 			allowNull: false
 		},
-		activo_marca: {
+		activo_plugin: {
+			type: DataTypes.BOOLEAN,
+			allowNull: false
+		},
+		desarrollo_url_plugin: {
 			type: DataTypes.BOOLEAN,
 			allowNull: false
 		}
 	}, {
-		tableName: 'marca',
+		tableName: 'plugin',
 		timestamps: false
 	});
 };

@@ -5,32 +5,23 @@ module.exports = function(sequelize, DataTypes) {
 		id_mercancia: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
-			primaryKey: true,
-			autoIncrement: true
+			defaultValue: 'nextval(mercancia_id_mercancia_seq::regclass)',
+			primaryKey: true
 		},
 		id_tipo_mercancia: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
-			references: {
-				model: 'tipo_mercancia',
-				key: 'id_tipo_mercancia'
-			}
+			primaryKey: true
 		},
 		id_envia: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
-			references: {
-				model: 'responsable',
-				key: 'id_responsable'
-			}
+			primaryKey: true
 		},
 		id_recibe: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
-			references: {
-				model: 'responsable',
-				key: 'id_responsable'
-			}
+			primaryKey: true
 		},
 		descripcion_mercancia: {
 			type: DataTypes.STRING,

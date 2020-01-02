@@ -5,24 +5,18 @@ module.exports = function(sequelize, DataTypes) {
 		id_transporte: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
-			primaryKey: true,
-			autoIncrement: true
+			defaultValue: 'nextval(transporte_id_transporte_seq::regclass)',
+			primaryKey: true
 		},
 		id_pais: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
-			references: {
-				model: 'pais',
-				key: 'id_pais'
-			}
+			primaryKey: true
 		},
 		id_marca: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
-			references: {
-				model: 'marca',
-				key: 'id_marca'
-			}
+			primaryKey: true
 		},
 		placa_transporte: {
 			type: DataTypes.STRING,

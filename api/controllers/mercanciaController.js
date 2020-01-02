@@ -1,13 +1,13 @@
 'use strict';
 const models = require('../../models/index');
 const request = require('request');
-const rp = require('request-promise-native');
 const fetch = require('node-fetch');
 
 const Mercancia = models.mercancia;
 const Responsable = models.responsable;
 const Pais = models.pais;
 const TipoMercancia = models.tipo_mercancia;
+const Plugin = models.plugin;
 
 exports.get_mercancia = function(req, res){
 	if(isNaN(parseInt(req.params.id_mercancia))){
@@ -60,6 +60,38 @@ exports.get_mercancia_detalles = async function(req, res){
 	}
 	let detalles = [];
 	let errores = [];
+	Plugin.findAll({
+		where:{
+			activo_plugin : true,
+			desarrollo_url_plugin: process.env.NODE_ENV !== 'production'
+		}
+	}).then(plugins => {
+		let cantidad = plugins.length;
+		plugins.forEach(async plugin => {
+			try {
+				let detallePromise = await fetch(`${plugin.url_plugin}api/plugin/pasa/${req.params.id_mercancia}/detalle`);
+				let detalle = await detallePromise.json();
+				detalles = detalles.concat(detalle);
+			}catch(error){
+				console.log('Error: ', error);
+				errores.push("No se pudo contactar a Plugin " + plugin.url_plugin);
+			}finally{
+				cantidad--;
+				if(cantidad === 0){
+					let respuesta = new Object();
+					respuesta.detalles = detalles;
+					respuesta.errores = errores;
+					res.status(200).json(respuesta);
+				}
+			}
+		});
+		
+	}).catch(err => {
+		console.log(err);
+		res.status(500).json({msg: 'Error buscando los plugins activos'});
+		return;
+	});
+	/*
 	try {
 		let detallePromiseA = await fetch(`http://localhost:3001/api/plugina/pasa/${req.params.id_mercancia}/detalle`);
 		let detalleA = await detallePromiseA.json();
@@ -76,35 +108,6 @@ exports.get_mercancia_detalles = async function(req, res){
 		console.log(errorB);
 		errores.push("No se pudo contactar a Plugin B");
 	}
-	let respuesta = new Object();
-	respuesta.detalles = detalles;
-	respuesta.errores = errores;
-	res.status(200).json(respuesta);
-	/*request(`http://localhost:3001/api/plugina/pasa/${req.params.id_mercancia}/detalle`, function(errorA, resPlugA, bodyPlugA){
-		if (errorA){
-			errores.push("No se pudo contactar a plugin A");
-		}
-		else{
-			if(resPlugA.statusCode === 200){
-				console.log(JSON.parse(bodyPlugA));
-				detalles = detalles.concat(JSON.parse(bodyPlugA));
-			}
-		}
-		request(`http://localhost:3002/api/pluginb/pasa/${req.params.id_mercancia}/detalle`, function(errorB, resPlugB, bodyPlugB){
-			if(errorB){
-				errores.push("No se pudo contactar a plugin B");
-			}
-			else{
-				if(resPlugB.statusCode === 200){
-					console.log(JSON.parse(bodyPlugB));
-					detalles = detalles.concat(JSON.parse(bodyPlugB));
-					let respuesta = new Object();
-					respuesta.detalles = detalles;
-					respuesta.errores = errores;
-					res.status(200).json(respuesta);
-				}
-			}
-		});
-	});
 	*/
+	
 }

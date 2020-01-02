@@ -133,6 +133,25 @@ CREATE SEQUENCE public.pais_id_pais_seq
 ALTER SEQUENCE public.pais_id_pais_seq OWNED BY public.pais.id_pais;
 
 
+-- Ingresado manualmente
+CREATE TABLE public.plugin (
+    id_plugin integer NOT NULL,
+    url_plugin character varying(1024) NOT NULL,
+    activo_plugin boolean NOT NULL,
+    desarrollo_url_plugin boolean NOT NULL
+);
+
+
+CREATE SEQUENCE public.plugin_id_plugin_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.plugin_id_plugin_seq OWNED BY public.plugin.id_plugin;
+
 --
 -- TOC entry 203 (class 1259 OID 25322)
 -- Name: responsable; Type: TABLE; Schema: public; Owner: -
@@ -336,6 +355,12 @@ INSERT INTO public.pais (id_pais, nombre_pais, activo_pais) VALUES (5, 'Panama',
 INSERT INTO public.pais (id_pais, nombre_pais, activo_pais) VALUES (6, 'Belice', false);
 
 
+
+INSERT INTO public.plugin (id_plugin, url_plugin, activo_plugin, desarrollo_url_plugin) VALUES (1, 'http://localhost:3001/', true, true);
+INSERT INTO public.plugin (id_plugin, url_plugin, activo_plugin, desarrollo_url_plugin) VALUES (2, 'http://localhost:3002/', true, true);
+
+
+
 --
 -- TOC entry 2980 (class 0 OID 25322)
 -- Dependencies: 203
@@ -417,6 +442,8 @@ SELECT pg_catalog.setval('public.mercancia_id_mercancia_seq', 7, true);
 --
 
 SELECT pg_catalog.setval('public.pais_id_pais_seq', 6, true);
+
+SELECT pg_catalog.setval('public.plugin_id_plugin_seq', 2, true);
 
 
 --

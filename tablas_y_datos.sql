@@ -358,7 +358,10 @@ INSERT INTO public.pais (id_pais, nombre_pais, activo_pais) VALUES (6, 'Belice',
 
 INSERT INTO public.plugin (id_plugin, url_plugin, activo_plugin, desarrollo_url_plugin) VALUES (1, 'http://localhost:3001/', true, true);
 INSERT INTO public.plugin (id_plugin, url_plugin, activo_plugin, desarrollo_url_plugin) VALUES (2, 'http://localhost:3002/', true, true);
-
+insert into plugin (id_plugin, url_plugin, activo_plugin, desarrollo_url_plugin)
+values(3, 'https://igfplugina.herokuapp.com/', true, false);
+insert into plugin (id_plugin, url_plugin, activo_plugin, desarrollo_url_plugin)
+values(4, 'https://igfpluginb.herokuapp.com/', true, false);
 
 
 --
@@ -443,7 +446,7 @@ SELECT pg_catalog.setval('public.mercancia_id_mercancia_seq', 7, true);
 
 SELECT pg_catalog.setval('public.pais_id_pais_seq', 6, true);
 
-SELECT pg_catalog.setval('public.plugin_id_plugin_seq', 2, true);
+SELECT pg_catalog.setval('public.plugin_id_plugin_seq', 4, true);
 
 
 --

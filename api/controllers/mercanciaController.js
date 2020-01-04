@@ -14,11 +14,22 @@ exports.get_mercancia = function(req, res){
 		res.status(400).json({ msg: 'Utilizar parametros numericos'});
 		return;
 	}
+	let atributosResponsable = [
+		'id_responsable',
+		'nombres_responsable',
+		'apellidos_responsable',
+		'fecha_nac_responsable',
+		'direccion_responsable'
+	];
+	if(req.query.privado){
+		atributosResponsable = ['id_pais'];
+	}
 	Mercancia.findOne({
 			include:[
 				{
 					model: Responsable,
 					as: 'envia',
+					attributes: atributosResponsable,
 					include:[
 						{
 							model: Pais,
@@ -29,6 +40,7 @@ exports.get_mercancia = function(req, res){
 				{
 					model: Responsable,
 					as: 'recibe',
+					attributes: atributosResponsable,
 					include:[
 						{
 							model: Pais,
@@ -91,23 +103,4 @@ exports.get_mercancia_detalles = async function(req, res){
 		res.status(500).json({msg: 'Error buscando los plugins activos'});
 		return;
 	});
-	/*
-	try {
-		let detallePromiseA = await fetch(`http://localhost:3001/api/plugina/pasa/${req.params.id_mercancia}/detalle`);
-		let detalleA = await detallePromiseA.json();
-		detalles = detalles.concat(detalleA);
-	}catch(error){
-		console.log(error);
-		errores.push("No se pudo contactar a Plugin A");
-	}
-	try {
-		let detallePromiseB = await fetch(`http://localhost:3002/api/pluginb/pasa/${req.params.id_mercancia}/detalle`);
-		let detalleB = await detallePromiseB.json();
-		detalles = detalles.concat(detalleB);
-	}catch(errorB){
-		console.log(errorB);
-		errores.push("No se pudo contactar a Plugin B");
-	}
-	*/
-	
 }

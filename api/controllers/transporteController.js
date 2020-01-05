@@ -21,7 +21,7 @@ exports.get_transportes = function(req, res){
 	Transporte.findAll({
 		where: condicion
 	}).then(transporte => {
-		if(transporte !== null){
+		if(transporte !== null && transporte.length > 0){
 			res.status(200).json(transporte);
 		}
 		else{

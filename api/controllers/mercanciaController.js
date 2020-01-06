@@ -72,35 +72,46 @@ exports.get_mercancia_detalles = async function(req, res){
 	}
 	let detalles = [];
 	let errores = [];
-	Plugin.findAll({
+	Mercancia.findOne({
 		where:{
-			activo_plugin : true,
-			desarrollo_url_plugin: process.env.NODE_ENV !== 'production'
+			id_mercancia: parseInt(req.params.id_mercancia)
 		}
-	}).then(plugins => {
-		let cantidad = plugins.length;
-		plugins.forEach(async plugin => {
-			try {
-				let detallePromise = await fetch(`${plugin.url_plugin}api/plugin/pasa/${req.params.id_mercancia}/detalle`);
-				let detalle = await detallePromise.json();
-				detalles = detalles.concat(detalle);
-			}catch(error){
-				console.log('Error: ', error);
-				errores.push("No se pudo contactar a Plugin " + plugin.url_plugin);
-			}finally{
-				cantidad--;
-				if(cantidad === 0){
-					let respuesta = new Object();
-					respuesta.detalles = detalles;
-					respuesta.errores = errores;
-					res.status(200).json(respuesta);
+	}).then(mercancia => {
+		if (mercancia === null){
+			res.status(404).json({msg: 'Mercancia no existe'});
+		}
+		else{
+			Plugin.findAll({
+				where:{
+					activo_plugin : true,
+					desarrollo_url_plugin: process.env.NODE_ENV !== 'production'
 				}
-			}
-		});
-		
-	}).catch(err => {
-		console.log(err);
-		res.status(500).json({msg: 'Error buscando los plugins activos'});
-		return;
+			}).then(plugins => {
+				let cantidad = plugins.length;
+				plugins.forEach(async plugin => {
+					try {
+						let detallePromise = await fetch(`${plugin.url_plugin}api/plugin/pasa/${req.params.id_mercancia}/detalle`);
+						let detalle = await detallePromise.json();
+						detalles = detalles.concat(detalle);
+					}catch(error){
+						console.log('Error: ', error);
+						errores.push("No se pudo contactar a Plugin " + plugin.url_plugin);
+					}finally{
+						cantidad--;
+						if(cantidad === 0){
+							let respuesta = new Object();
+							respuesta.detalles = detalles;
+							respuesta.errores = errores;
+							res.status(200).json(respuesta);
+						}
+					}
+				});
+				
+			}).catch(err => {
+				console.log(err);
+				res.status(500).json({msg: 'Error buscando los plugins activos'});
+				return;
+			});
+		}
 	});
 }

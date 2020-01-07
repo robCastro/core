@@ -91,8 +91,11 @@ exports.get_mercancia_detalles = async function(req, res){
 				plugins.forEach(async plugin => {
 					try {
 						let detallePromise = await fetch(`${plugin.url_plugin}api/plugin/pasa/${req.params.id_mercancia}/detalle`);
-						let detalle = await detallePromise.json();
-						detalles = detalles.concat(detalle);
+						console.log('Promesa: ' + plugin.url_plugin, detallePromise.status);
+						if (detallePromise.status !== 404){
+							let detalle = await detallePromise.json();
+							detalles = detalles.concat(detalle);
+						}
 					}catch(error){
 						console.log('Error: ', error);
 						errores.push("<ul>No se pudo contactar a Plugin " + plugin.url_plugin + "</ul>");

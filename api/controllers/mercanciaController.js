@@ -95,18 +95,20 @@ exports.get_mercancia_detalles = async function(req, res){
 						detalles = detalles.concat(detalle);
 					}catch(error){
 						console.log('Error: ', error);
-						errores.push("No se pudo contactar a Plugin " + plugin.url_plugin);
+						errores.push("<ul>No se pudo contactar a Plugin " + plugin.url_plugin + "</ul>");
 					}finally{
 						cantidad--;
 						if(cantidad === 0){
 							let respuesta = new Object();
 							respuesta.detalles = detalles;
-							respuesta.errores = errores;
+							respuesta.errores = "";
+							errores.forEach(error => {
+								respuesta.errores = respuesta.errores + error;
+							});
 							res.status(200).json(respuesta);
 						}
 					}
-				});
-				
+				});				
 			}).catch(err => {
 				console.log(err);
 				res.status(500).json({msg: 'Error buscando los plugins activos'});

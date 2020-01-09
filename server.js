@@ -5,12 +5,23 @@ var express = require('express'),
 const cors = require('cors');
 const asociar = require('./asociar');
 
+const http = require('http').createServer(app.use(cors()));
+const io = require('socket.io')(http);
+
 asociar.implementar();
 
-app.listen(port);
-app.use(cors());
+io.on('connection', function(socket){
+	console.log('Nueva Conexion');
+
+	socket.on('nuevo_paso', function(id_mercancia){
+		console.log('Nuevo paso recibido: ', id_mercancia);
+		io.emit('nuevo_detalle', id_mercancia);
+	});
+});
+
 
 app.use('/api/core', require('./api/routes/routes'));
 
-console.log('RESTful API server started on: ' + port);
-
+http.listen(port, function(){
+	console.log('listening on *: ' + port);
+});
